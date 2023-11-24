@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prime Number Checker</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      #result {
+        margin-bottom: 20px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      #details-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+        overflow: auto;
+        height: 800px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Prime Number Checker</h1>
+    <label for="start">Start Range:</label>
+    <input type="number" id="start" placeholder="Start" />
+    <label for="end">End Range:</label>
+    <input type="number" id="end" placeholder="End" />
+    <button onclick="checkPrimes()">Check Primes</button>
+
+    <div id="result"></div>
+
+    <div id="details-popup">
+      <button onclick="closeDetails()">Close</button>
+      <div id="tab1">
+        <h2>Time taken to check if a number is prime</h2>
+        <table id="table1">
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Time (ms)</th>
+            </tr>
+          </thead>
+          <tbody id="tab1-body"></tbody>
+        </table>
+      </div>
+      <div id="tab2">
+        <h2>Time taken to determine if a number is prime</h2>
+        <table id="table2">
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Time (ms)</th>
+            </tr>
+          </thead>
+          <tbody id="tab2-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function checkPrimes() {
+        const start = parseInt(document.getElementById("start").value);
+        const end = parseInt(document.getElementById("end").value);
+
+        if (isNaN(start) || isNaN(end)) {
+          alert("Please enter valid numbers for the range.");
+          return;
+        }
+
+        const primes = getPrimesInRange(start, end);
+
+        // Display results
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = `<h2>Prime Numbers in Range (${start} to ${end}):</h2>`;
+        resultDiv.innerHTML += primes.join(", ");
+
+        // Display Details button
+        resultDiv.innerHTML += `<br><button onclick="showDetails()">Details</button>`;
+      }
+
+      // Function to check if a number is prime
+      function isPrime(num) {
+        if (num < 2) return false;
+        for (let i = 2; i <= Math.sqrt(num); i++) {
+          if (num % i === 0) return false;
+        }
+        return true;
+      }
+
+      // Function to get all prime numbers in a given range
+      function getPrimesInRange(start, end) {
+        const primes = [];
+        const startTime = performance.now();
+
+        for (let i = start; i <= end; i++) {
+          const checkStartTime = performance.now();
+          const isPrimeNumber = isPrime(i);
+          const checkEndTime = performance.now();
+
+          if (isPrimeNumber) {
+            primes.push(i);
+          }
+
+          const checkTime = checkEndTime - checkStartTime;
+          console.log(
+            `Time taken to check if ${i} is prime: ${checkTime} milliseconds`
+          );
+        }
+
+        const endTime = performance.now();
+        const totalTime = endTime - startTime;
+        console.log(
+          `Time taken to run getPrimesInRange: ${totalTime} milliseconds`
+        );
+
+        return primes;
+      }
+
+      function showDetails() {
+        const popup = document.getElementById("details-popup");
+        popup.style.display = "block";
+
+        const tab1Body = document.getElementById("tab1-body");
+        const tab2Body = document.getElementById("tab2-body");
+
+        const start = parseInt(document.getElementById("start").value);
+        const end = parseInt(document.getElementById("end").value);
+
+        for (let i = start; i <= end; i++) {
+          const checkStartTime = performance.now();
+          const isPrimeNumber = isPrime(i);
+          const checkEndTime = performance.now();
+
+          const checkTime = checkEndTime - checkStartTime;
+
+          // Tab 1: Time taken to check if a number is prime
+          const row1 = document.createElement("tr");
+          row1.innerHTML = `<td>${i}</td><td>${checkTime.toFixed(4)}</td>`;
+          tab1Body.appendChild(row1);
+
+          if (isPrimeNumber) {
+            const primeCheckStartTime = performance.now();
+            isPrime(i);
+            const primeCheckEndTime = performance.now();
+            const primeCheckTime = primeCheckEndTime - primeCheckStartTime;
+
+            // Tab 2: Time taken to determine if a number is prime
+            const row2 = document.createElement("tr");
+            row2.innerHTML = `<td>${i}</td><td>${primeCheckTime.toFixed(
+              4
+            )}</td>`;
+            tab2Body.appendChild(row2);
+          }
+        }
+      }
+
+      function closeDetails() {
+        const popup = document.getElementById("details-popup");
+        popup.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
